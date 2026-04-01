@@ -147,6 +147,30 @@ Sample circuits in `ckts/` (ISCAS-85 benchmark suite):
 | c1355 | ~546 | 41 | 32 |
 | c3540 | ~1669 | 50 | 22 |
 
+## Scan Chain Subproject
+
+A sequential circuit scan insertion and test simulator lives in [`scan/`](scan/). It parses ISCAS-89 `.bench` netlists, models full scan insertion (every DFF becomes a scan FF), and measures stuck-at fault coverage by treating the circuit as a combinational equivalent between pseudo-PIs and pseudo-POs.
+
+```bash
+cd scan && mkdir build && cd build
+cmake .. && make
+./scan-simulator ../benchmarks/s27.bench -n 1000
+```
+
+See [scan/README.md](scan/README.md) for full usage.
+
+## BIST Subproject
+
+A standalone Built-In Self-Test simulator lives in [`bist/`](bist/). It parses the same ISCAS-85 `.ckt` netlists and runs pseudo-random BIST with an LFSR pattern generator and MISR response compactor, reporting stuck-at fault coverage.
+
+```bash
+cd bist && mkdir build && cd build
+cmake .. && make
+./bist-simulator ../../ckts/c432.ckt -n 2000
+```
+
+See [bist/README.md](bist/README.md) for full usage.
+
 ## Project Structure
 
 ```
@@ -155,6 +179,7 @@ circuit-atpg-simulator/
 ├── includes/     # Header files
 │   └── core/     # Algorithm headers
 ├── ckts/         # Circuit netlists (ISCAS-85 benchmarks)
+├── bist/         # BIST simulator subproject
 ├── main.cpp      # Entry point & command parser
 └── CMakeLists.txt
 ```
