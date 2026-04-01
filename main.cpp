@@ -16,7 +16,6 @@
 
 using namespace logicsim;
 
-// TODO: replace marcos with class methods (helper class?)
 #define Upcase(x) ((isalpha(x) && islower(x)) ? toupper(x) : (x))
 #define Lowcase(x) ((isalpha(x) && isupper(x)) ? tolower(x) : (x))
 

@@ -129,6 +129,16 @@ cd scan && mkdir build && cd build && cmake .. && make
 ./scan-simulator ../benchmarks/s27.bench -n 1000
 ```
 
+## Known Limitations
+
+**PODEM not wired into TPG** — PODEM works as a standalone command (`PODEM <node> <val>`) but isn't integrated into the TPG loop. Hooking it in requires refactoring `pathOrientedDecisionMaking_impl` to return the PI pattern in the same format DALG does and to support the per-fault state reset TPG needs. DALG covers the same fault set in practice.
+
+**Combinational circuits only** — the ATPG core and BIST target ISCAS-85 (combinational). Sequential fault testing requires scan insertion, which is what the `scan/` subproject handles separately.
+
+**No X-propagation** — unknowns in the circuit are handled conservatively (UNDEF propagates), but there's no X-bounding or X-masking. On circuits with many uninitialized paths this can undercount detectable faults.
+
+**No fault dropping optimisation in BIST** — the BIST fault simulator rescans all undetected faults every pattern rather than using a parallel bitsliced approach. Fine for ISCAS-85 sizes, would need rework for circuits with tens of thousands of faults.
+
 ## Structure
 
 ```

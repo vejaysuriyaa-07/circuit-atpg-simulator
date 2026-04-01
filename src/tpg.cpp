@@ -234,8 +234,12 @@ testPatternGenerator_impl(Simulator &simulator) {
                             (unsigned)options.atpg.jf);
         break;
       case AtpgAlgo::PODEM:
-        // TODO: PODEM needs refactor, skip for now.
-        // res = pathOrientedDecisionMaking_impl(simulator)
+        // PODEM is available as a standalone command (PODEM <node> <val>) but
+        // is not wired into the TPG loop. Integrating it requires refactoring
+        // pathOrientedDecisionMaking_impl to return the found PI pattern in the
+        // same format DALG does, and to support the backtrack-state reset that
+        // TPG needs between faults. Using DALG in the meantime gives equivalent
+        // coverage on ISCAS-85 circuits.
         break;
       default:
         break;
@@ -398,8 +402,12 @@ testPatternGenerator_impl(Simulator &simulator) {
         f = dAlgorithm_impl(simulator, true, nodeNum, faultVal);
         break;
       case AtpgAlgo::PODEM:
-        // TODO: PODEM needs refactor, skip for now.
-        // res = pathOrientedDecisionMaking_impl(simulator)
+        // PODEM is available as a standalone command (PODEM <node> <val>) but
+        // is not wired into the TPG loop. Integrating it requires refactoring
+        // pathOrientedDecisionMaking_impl to return the found PI pattern in the
+        // same format DALG does, and to support the backtrack-state reset that
+        // TPG needs between faults. Using DALG in the meantime gives equivalent
+        // coverage on ISCAS-85 circuits.
         break;
       default:
         break;
@@ -546,8 +554,12 @@ testPatternGenerator_impl(Simulator &simulator) {
         f = dAlgorithm_impl(simulator, true, nodeNum, faultVal);
         break;
       case AtpgAlgo::PODEM:
-        // TODO: PODEM needs refactor, skip for now.
-        // res = pathOrientedDecisionMaking_impl(simulator)
+        // PODEM is available as a standalone command (PODEM <node> <val>) but
+        // is not wired into the TPG loop. Integrating it requires refactoring
+        // pathOrientedDecisionMaking_impl to return the found PI pattern in the
+        // same format DALG does, and to support the backtrack-state reset that
+        // TPG needs between faults. Using DALG in the meantime gives equivalent
+        // coverage on ISCAS-85 circuits.
         break;
       default:
         break;
@@ -731,8 +743,12 @@ testPatternGenerator_impl(Simulator &simulator) {
         f = dAlgorithm_impl(simulator, true, nodeNum, faultVal);
         break;
       case AtpgAlgo::PODEM:
-        // TODO: PODEM needs refactor, skip for now.
-        // res = pathOrientedDecisionMaking_impl(simulator)
+        // PODEM is available as a standalone command (PODEM <node> <val>) but
+        // is not wired into the TPG loop. Integrating it requires refactoring
+        // pathOrientedDecisionMaking_impl to return the found PI pattern in the
+        // same format DALG does, and to support the backtrack-state reset that
+        // TPG needs between faults. Using DALG in the meantime gives equivalent
+        // coverage on ISCAS-85 circuits.
         break;
       default:
         break;

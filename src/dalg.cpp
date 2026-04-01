@@ -294,6 +294,25 @@ bool justifyJFrontier(Simulator &simulator, std::vector<Node *> &JFrontier,
   return justifyJFrontier(simulator, JFrontier, index + 1, JF_arg);
 }
 
+// Core recursive D-Algorithm step.
+//
+// Each call represents one level of the search tree. The flow is:
+//   1. Imply forward from the current node assignments, propagating D/D' values
+//      and building the D-frontier (gates with D/D' on at least one input but
+//      UNDEF output — candidates to propagate the fault toward a PO).
+//   2. If a D/D' reaches a PO and the J-frontier is empty, we have a complete
+//      test — assign any remaining UNDEF PIs and return true.
+//   3. If a D/D' reaches a PO but the J-frontier is non-empty, we still need
+//      to justify the UNDEF gates (gates with a known output but unset inputs).
+//      justifyJFrontier handles this recursively.
+//   4. If no D/D' at PO yet, pick a D-frontier gate (DF_arg controls the
+//      heuristic — e.g. lowest/highest level, SCOAP CC), set its output to D
+//      or D', and recurse. On failure, restore the snapshot and try the next
+//      D-frontier choice.
+//
+// DF_arg: D-frontier selection heuristic (0=no-limit, 1=highest, 2=lowest,
+//         3=SCOAP CC)
+// JF_arg: J-frontier justification order (0=default, 1=SCOAP CC-guided)
 bool dalg(Simulator &simulator, std::vector<Node *> &nodes,
           std::vector<Node *> &extraNodes, unsigned DF_arg, unsigned JF_arg) {
   if (++g_dalgCallCount > kMaxDalgCalls) {
@@ -492,8 +511,10 @@ bool dalg(Simulator &simulator, std::vector<Node *> &nodes,
       node->setValue(evaluate(node, 0), 0);
     }
     if (!xorFlag) {
-      // TODO: for those implied nodes, implications related to them should be
-      // considered as J-frontiers. So should JF be global or local?
+      // Implied fanin nodes from the chosen D-frontier gate become the new
+      // node set for the next recursive call. Their implications may introduce
+      // additional J-frontier entries, which are built fresh each call rather
+      // than accumulated globally — avoids stale JF state across backtrack levels.
       if (!dalg(simulator, choice, impliedInNodes, DF_arg, JF_arg)) {
         // Restore snapshot and try next D-frontier choice
         for (std::size_t j = 0; j < allNodes.size(); ++j) {
