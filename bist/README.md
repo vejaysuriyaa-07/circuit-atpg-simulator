@@ -1,14 +1,16 @@
 # BIST Simulator
 
-A Built-In Self-Test simulator for ISCAS-85 benchmark circuits. Uses an LFSR to generate pseudo-random test patterns, simulates the circuit, compresses output responses through a MISR, and measures stuck-at fault coverage via parallel fault simulation.
+Built this to understand the LFSR/MISR architecture that shows up in pretty much every logic BIST implementation. The idea is simple — use an LFSR to generate pseudo-random test patterns, run them through the circuit, compress the output responses into a signature via a MISR, and track how many stuck-at faults you catch along the way.
 
-## Architecture
+Tested on ISCAS-85 benchmarks. Getting above 95% on c432 and c880 was the goal — ended up at 98.84% and 97.50% with 2000 patterns.
 
-**LFSR** — Galois-configuration linear feedback shift register. Generates pseudo-random bits using a primitive polynomial for the given width. For circuits with more primary inputs than the LFSR width, the register is clocked multiple times per pattern (phase shifting) to fill all inputs.
+## How it works
 
-**MISR** — Multiple Input Signature Register. Same shift-register structure as the LFSR but XORs incoming output response bits into the state at each clock. The final state is the circuit's signature.
+**LFSR** — Galois-configuration shift register. Uses standard primitive polynomials (looked these up — there's a well-known table for widths 4, 8, 16, 32). For circuits with more primary inputs than the LFSR width, it just clocks the LFSR multiple times per pattern to fill all the inputs. This is called phase shifting.
 
-**Fault Simulation** — For each pattern, every undetected stuck-at fault is injected by forcing the faulted gate's output to its stuck value, then re-simulating. If any primary output differs from the fault-free response, the fault is marked detected.
+**MISR** — Same hardware structure as the LFSR but instead of just shifting, it XORs the circuit's output bits into the register at each clock. The final state after all patterns is the signature. If the circuit has a fault, the signature will (almost certainly) differ from the golden value.
+
+**Fault simulation** — For each test pattern, any fault not yet detected gets re-simulated with the fault injected (just force the gate output to the stuck value). If any PO differs from the fault-free run, the fault is marked detected. Keeps going until all patterns are done.
 
 ## Build
 
@@ -25,10 +27,10 @@ cmake .. && make
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-n` | 1024 | Number of test patterns |
-| `-seed` | 0xACE1 | LFSR seed |
-| `-misr` | 32 | MISR width in bits |
-| `-o` | — | Write per-pattern CSV data to file |
+| `-n` | 1024 | number of patterns to run |
+| `-seed` | 0xACE1 | LFSR starting seed |
+| `-misr` | 32 | MISR register width |
+| `-o` | — | dump per-pattern CSV to a file |
 
 ## Examples
 
@@ -38,7 +40,7 @@ cmake .. && make
 ./bist-simulator ../../ckts/c880.ckt -n 2000 -o coverage.csv
 ```
 
-## Sample Output
+## Output
 
 ```
 ============================================
@@ -58,7 +60,7 @@ cmake .. && make
 ============================================
 ```
 
-## Fault Coverage Results
+## Results
 
 | Circuit | Patterns | Fault Coverage |
 |---------|----------|----------------|
